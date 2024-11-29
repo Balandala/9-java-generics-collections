@@ -1,11 +1,10 @@
 package com.example.task03;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class Task03Main {
 
@@ -19,6 +18,28 @@ public class Task03Main {
     }
 
     public static List<Set<String>> findAnagrams(InputStream inputStream, Charset charset) {
-        return null;
+        Map<String, Set<String>> map = new TreeMap<>();
+        List<Set<String>> result = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charset))){
+            reader.lines()
+                    .map(w -> w.toLowerCase())
+                    .filter(w -> w.matches("[а-я]+") && w.length() > 2)
+                    .forEach(word -> {
+                        String sortedChars = word.chars().sorted().mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
+                        if (!map.containsKey(sortedChars))
+                            map.put(sortedChars, new TreeSet<>());
+                        map.get(sortedChars).add(word);
+                    });
+
+        } catch (IOException e){
+            System.out.println("An error occurred!");
+        }
+
+    map.entrySet().forEach(e -> {
+        if (e.getValue().size() > 1)
+            result.add(e.getValue());
+    });
+    return result;
     }
 }
